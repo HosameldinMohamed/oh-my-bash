@@ -201,7 +201,7 @@ prompt_end() {
         PR="$PR $(ansi codes[@])$SEGMENT_SEPARATOR"
     fi
     declare -a reset=($(text_effect reset))
-    PR="$PR $(ansi reset[@])"
+    PR="$PR $(ansi reset[@])\n"
     CURRENT_BG=''
 }
 
@@ -230,7 +230,7 @@ prompt_context() {
     local user=$(whoami)
 
     if [[ $user != $DEFAULT_USER || -n $SSH_CLIENT ]]; then
-        prompt_segment black default "$user 🮱"
+        prompt_segment black default "$user ⏲"
     fi
 }
 
@@ -265,6 +265,13 @@ prompt_git() {
 # Dir: current working directory
 prompt_dir() {
     prompt_segment blue black '\w'
+}
+
+# Conda: conda environment
+prompt_conda() {
+    if [ "$CONDA_DEFAULT_ENV" != "base" ]; then
+        prompt_segment blue black "$CONDA_DEFAULT_ENV"
+    fi
 }
 
 # Status:
@@ -399,6 +406,7 @@ prompt_emacsdir() {
 ## Main prompt
 
 build_prompt() {
+    prompt_conda
     [[ ! -z ${AG_EMACS_DIR+x} ]] && prompt_emacsdir
     prompt_status
     #[[ -z ${AG_NO_HIST+x} ]] && prompt_histdt
