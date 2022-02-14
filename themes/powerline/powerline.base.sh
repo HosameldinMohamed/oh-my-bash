@@ -1,7 +1,7 @@
 #! bash oh-my-bash.module
 
 # Define this here so it can be used by all of the Powerline themes
-THEME_CHECK_SUDO=${THEME_CHECK_SUDO:=true}
+THEME_CHECK_SUDO=${THEME_CHECK_SUDO:=false}
 
 function set_color {
   if [[ "${1}" != "-" ]]; then
@@ -19,7 +19,8 @@ function __powerline_user_info_prompt {
   local color=${USER_INFO_THEME_PROMPT_COLOR}
 
   if [[ "${THEME_CHECK_SUDO}" = true ]]; then
-    if sudo -n uptime 2>&1 | grep -q "load"; then
+    # check whether sudo is active for no-password executions
+    if sudo -n cat <<< c3bcc5c 2>&1 | grep -q c3bcc5c; then
       color=${USER_INFO_THEME_PROMPT_COLOR_SUDO}
     fi
   fi
@@ -129,9 +130,9 @@ function __powerline_left_segment {
   local separator=""
 
   if [[ "${SEGMENTS_AT_LEFT}" -gt 0 ]]; then
-    separator="$(set_color ${LAST_SEGMENT_COLOR} ${params[1]})${separator_char}${normal}"
+    separator="$(set_color ${LAST_SEGMENT_COLOR} ${params[1]})${separator_char}${_omb_prompt_normal}"
   fi
-  LEFT_PROMPT+="${separator}$(set_color - ${params[1]}) ${params[0]} ${normal}"
+  LEFT_PROMPT+="${separator}$(set_color - ${params[1]}) ${params[0]} ${_omb_prompt_normal}"
   LAST_SEGMENT_COLOR=${params[1]}
   (( SEGMENTS_AT_LEFT += 1 ))
 }
@@ -159,7 +160,7 @@ function __powerline_prompt_command {
     [[ -n "${info}" ]] && __powerline_left_segment "${info}"
   done
   [[ "${last_status}" -ne 0 ]] && __powerline_left_segment $(__powerline_last_status_prompt ${last_status})
-  [[ -n "${LEFT_PROMPT}" ]] && LEFT_PROMPT+="$(set_color ${LAST_SEGMENT_COLOR} -)${separator_char}${normal}"
+  [[ -n "${LEFT_PROMPT}" ]] && LEFT_PROMPT+="$(set_color ${LAST_SEGMENT_COLOR} -)${separator_char}${_omb_prompt_normal}"
 
   PS1="${LEFT_PROMPT} "
 

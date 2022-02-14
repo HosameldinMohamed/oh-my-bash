@@ -3,31 +3,47 @@
 # Checks the minium version of bash (v3.2) installed,
 # stops the installation if check fails
 if [ -z "${BASH_VERSION-}" ]; then
-  printf "Error: Bash 3.2 required for Oh My Bash.\n"
-  printf "Error: Install Bash and try running this script with Bash.\n"
-  return 1 &>/dev/null || exit 1
+  printf "Error: Bash 3.2 or higher is required for Oh My Bash.\n"
+  printf "Error: Install Bash and try running this installation script with Bash.\n"
+  if command -v bash >/dev/null 2>&1; then
+    printf 'Example: \033[31;1mbash\033[0;34m -c "$(curl -fsSL https://raw.githubusercontent.com/ohmybash/oh-my-bash/master/tools/install.sh)"\n'
+  fi
+  return 1 >/dev/null 2>&1 || exit 1
 fi
 
 if [[ ! ${BASH_VERSINFO[0]-} ]] || ((BASH_VERSINFO[0] < 3 || BASH_VERSINFO[0] == 3 && BASH_VERSINFO[1] < 2)); then
-  printf "Error: Bash 3.2 required for Oh My Bash.\n"
-  printf "Error: Upgrade Bash and try again.\n"
+  printf "Error: Bash 3.2 required for Oh My Bash.\n" >&2
+  printf "Error: Upgrade Bash and try again.\n" >&2
   return 2 &>/dev/null || exit 2
+elif ((BASH_VERSINFO[0] < 4)); then
+  printf "Warning: Bash >=4 is no longer required for Oh My Bash but is cool to have ;)\n" >&2
+  printf "Warning: Why don't you upgrade your Bash to 4 or higher?\n" >&2
 fi
+
+_omb_install_print_version() {
+  local OMB_VERSINFO
+  OMB_VERSINFO=(1 0 0 0 master noarch)
+  printf '%s\n' 'Install script for Oh-My-Bash (https://github.com/ohmybash/oh-my-bash)'
+  printf 'oh-my-bash, version %s.%s.%s(%s)-%s (%s)\n' "${OMB_VERSINFO[@]}"
+}
 
 _omb_install_print_usage() {
   printf '%s\n' \
-    'usage: ./install.sh [--unattended | --help | --dry-run]' \
-    'usage: bash -c "$(< install.sh)" [--unattended | --help | --dry-run]'
+    'usage: ./install.sh [--unattended | --dry-run | --help | --usage | --version]' \
+    'usage: bash -c "$(< install.sh)" [--unattended | --dry-run | --help | --usage |' \
+    '           --version]'
 }
 
 _omb_install_print_help() {
+  _omb_install_print_version
   _omb_install_print_usage
   printf '%s\n' \
-    'Install script for Oh-My-Bash (https://github.com/ohmybash/oh-my-bash)' \
     '' \
     'OPTIONS' \
     '  --help            show this help' \
+    '  --usage           show usage' \
     '  --unattended      attend the meeting' \
+    '  --help            show version' \
     ''
 }
 
@@ -36,8 +52,11 @@ _omb_install_readargs() {
     local arg=$1; shift
     if [[ :$install_opts: != *:literal:* ]]; then
       case $arg in
-      --help | --unattended | --dry-run)
+      --help | --usage | --unattended | --dry-run)
         install_opts+=:${arg#--}
+        continue ;;
+      --version | -v)
+        install_opts+=:version
         continue ;;
       --)
         install_opts+=:literal
@@ -63,7 +82,7 @@ _omb_install_run() {
     printf '%s\n' "$BOLD$GREEN[dryrun]$NORMAL $BOLD$*$NORMAL" >&5
   else
     printf '%s\n' "$BOLD\$ $*$NORMAL" >&5
-    "$@"
+    command "$@"
   fi
 }
 
@@ -93,12 +112,27 @@ _omb_install_main() {
   local install_opts=
   _omb_install_readargs "$@"
 
+  if [[ :$install_opts: == *:error:* ]]; then
+    printf '\n'
+    install_opts+=:usage
+  fi
   if [[ :$install_opts: == *:help:* ]]; then
     _omb_install_print_help
-    return 0
-  elif [[ :$install_opts: == *:error:* ]]; then
-    _omb_install_print_usage
+    install_opts+=:exit
+  else
+    if [[ :$install_opts: == *:version:* ]]; then
+      _omb_install_print_version
+      install_opts+=:exit
+    fi
+    if [[ :$install_opts: == *:usage:* ]]; then
+      _omb_install_print_usage
+      install_opts+=:exit
+    fi
+  fi
+  if [[ :$install_opts: == *:error:* ]]; then
     return 2
+  elif [[ :$install_opts: == *:exit:* ]]; then
+    return 0
   fi
 
   # Only enable exit-on-error after the non-critical colorization stuff,
@@ -124,19 +158,19 @@ _omb_install_main() {
   umask g-w,o-w
 
   printf "${BLUE}Cloning Oh My Bash...${NORMAL}\n"
-  hash git >/dev/null 2>&1 || {
+  type -P git &>/dev/null || {
     echo "Error: git is not installed"
     return 1
   }
   # The Windows (MSYS) Git is not compatible with normal use on cygwin
   if [[ $OSTYPE = cygwin ]]; then
-    if git --version | grep msysgit > /dev/null; then
+    if command git --version | command grep msysgit > /dev/null; then
       echo "Error: Windows/MSYS Git is not supported on Cygwin"
       echo "Error: Make sure the Cygwin git package is installed and is first on the path"
       return 1
     fi
   fi
-  _omb_install_run env git clone --depth=1 https://github.com/ohmybash/oh-my-bash.git "$OSH" || {
+  _omb_install_run git clone --depth=1 https://github.com/ohmybash/oh-my-bash.git "$OSH" || {
     printf "Error: git clone of oh-my-bash repo failed\n"
     return 1
   }

@@ -312,7 +312,7 @@ __command_rprompt() {
     done
     [ -z "$times" ] || printf "%${n}s$times\\r" ''
 }
-# PROMPT_COMMAND=__command_rprompt
+# _omb_util_add_prompt_command __command_rprompt
 
 # this doens't wrap code in \[ \]
 ansi_r() {
@@ -424,7 +424,7 @@ build_prompt() {
 # this doesn't work... new model: create a prompt via a PR variable and
 # use that.
 
-set_bash_prompt() {
+_omb_theme_PROMPT_COMMAND() {
     RETVAL=$?
     PR=""
     PRIGHT=""
@@ -436,5 +436,4 @@ set_bash_prompt() {
     #     PS1='\[$(tput sc; printf "%*s" $COLUMNS "$PRIGHT"; tput rc)\]'$PR
     PS1=$PR
 }
-
-PROMPT_COMMAND=set_bash_prompt
+_omb_util_add_prompt_command _omb_theme_PROMPT_COMMAND

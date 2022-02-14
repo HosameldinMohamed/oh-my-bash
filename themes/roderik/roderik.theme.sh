@@ -6,12 +6,12 @@ export GIT_PS1_SHOWSTASHSTATE=true
 
 export PROMPT_DIRTRIM=3
 
-function prompt_command() {
+function _omb_theme_PROMPT_COMMAND() {
     if [[ ${EUID} == 0 ]] ; then
-        PS1="[$(clock_prompt)]${yellow}[${red}\u@\h ${green}\w${yellow}]${red}$(__git_ps1 "(%s)")${normal}\\$ "
+        PS1="[$(clock_prompt)]${_omb_prompt_olive}[${_omb_prompt_brown}\u@\h ${_omb_prompt_green}\w${_omb_prompt_olive}]${_omb_prompt_brown}$(__git_ps1 "(%s)")${_omb_prompt_normal}\\$ "
     else
-        PS1="[$(clock_prompt)]${yellow}[${cyan}\u@\h ${green}\w${yellow}]${red}$(__git_ps1 "(%s)")${normal}\\$ "
+        PS1="[$(clock_prompt)]${_omb_prompt_olive}[${_omb_prompt_teal}\u@\h ${_omb_prompt_green}\w${_omb_prompt_olive}]${_omb_prompt_brown}$(__git_ps1 "(%s)")${_omb_prompt_normal}\\$ "
     fi
 }
 
-_omb_util_add_prompt_command prompt_command
+_omb_util_add_prompt_command _omb_theme_PROMPT_COMMAND
