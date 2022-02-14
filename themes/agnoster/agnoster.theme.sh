@@ -212,13 +212,9 @@ prompt_virtualenv() {
         # stderr (e.g. if using pyenv, the output goes to stderr).
         VERSION_OUTPUT=$($VIRTUAL_ENV/bin/python --version 2>&1)
 
-        # The last word of the output of `python --version`
-        # corresponds to the version number.
-        VENV_VERSION=$(echo $VERSION_OUTPUT | awk '{print $NF}')
-
-        color=cyan
-        prompt_segment $color $PRIMARY_FG
-        prompt_segment $color white "$(basename $VENV_VERSION)"
+        color=yellow
+        # show the name of the virtual environment
+        prompt_segment $color black "🐱$(basename $VIRTUAL_ENV)"
     fi
 }
 
