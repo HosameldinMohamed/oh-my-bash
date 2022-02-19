@@ -226,7 +226,7 @@ prompt_context() {
     local user=$(whoami)
 
     if [[ $user != $DEFAULT_USER || -n $SSH_CLIENT ]]; then
-        prompt_segment black default "$user ⏲"
+        prompt_segment black green " "
     fi
 }
 
