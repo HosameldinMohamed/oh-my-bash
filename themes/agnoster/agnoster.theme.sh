@@ -214,7 +214,7 @@ prompt_virtualenv() {
 
         color=yellow
         # show the name of the virtual environment
-        prompt_segment $color black "🐱$(basename $VIRTUAL_ENV)"
+        prompt_segment $color black " $(basename $VIRTUAL_ENV)"
     fi
 }
 
