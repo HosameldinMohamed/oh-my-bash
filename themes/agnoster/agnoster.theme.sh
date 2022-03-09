@@ -224,9 +224,15 @@ prompt_virtualenv() {
 # Context: user@hostname (who am I and where am I)
 prompt_context() {
     local user=$(whoami)
-
+    local archdistro=$(lsb_release -a | grep Arch)
+    local logo=""
+    local col=green
+    if [[ -n $archdistro ]]; then
+      logo=""
+      col=blue
+    fi
     if [[ $user != $DEFAULT_USER || -n $SSH_CLIENT ]]; then
-        prompt_segment black green " "
+        prompt_segment black $col $logo" "
     fi
 }
 
