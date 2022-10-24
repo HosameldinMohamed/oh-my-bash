@@ -273,7 +273,7 @@ prompt_dir() {
 prompt_conda() {
     if [ ! -z "$CONDA_DEFAULT_ENV" ]; then
         if [ "$CONDA_DEFAULT_ENV" != "base" ]; then
-            prompt_segment blue black "$CONDA_DEFAULT_ENV"
+            prompt_segment blue black " $CONDA_DEFAULT_ENV"
         fi
     fi
 }
