@@ -231,6 +231,10 @@ prompt_context() {
       logo=""
       col=blue
     fi
+    local nameContainsGumby=$(cat /proc/sys/kernel/hostname | grep gumby)
+    if [[ -n $nameContainsGumby ]]; then
+      col=red
+    fi
     if [[ $user != $DEFAULT_USER || -n $SSH_CLIENT ]]; then
         prompt_segment black $col $logo" "
     fi
